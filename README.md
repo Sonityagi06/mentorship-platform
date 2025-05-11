@@ -43,7 +43,7 @@ chat.jsp, etc. │
 
 git clone https://github.com/Sonityagi06/mentorship-platform.git
 
-2. Import into Eclipse as a Dynamic Web Project.
+2. Import into Eclipse as a Maven Project.
 
 3. Configure Apache Tomcat server and set up the MySQL database using provided schema.
 
