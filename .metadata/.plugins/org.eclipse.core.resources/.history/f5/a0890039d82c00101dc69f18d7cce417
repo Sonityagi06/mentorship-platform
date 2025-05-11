@@ -1,0 +1,33 @@
+<%@ page import="com.hrit.mentorship_platform.model.Mentor" %>
+<%@ page import="com.hrit.mentorship_platform.dao.MentorDao" %>
+<%@ page import="com.hrit.mentorship_platform.model.User" %>
+<%
+    if (session == null || session.getAttribute("user") == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+
+User user = (User) session.getAttribute("user");
+MentorDao mentorDao = new MentorDao();
+Mentor mentor = mentorDao.getMentorIdByUserId(user.getId());
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="css/edit-profile.css">
+</head>
+<body>
+    <h2>Edit Your Profile</h2>
+    <form action="update-mentor-profile" method="post">
+        <input type="hidden" name="mentorId" value="<%= mentor.getId() %>">
+        Name: <input type="text" name="name" value="<%= mentor.getName() %>" required><br>
+        Contact No: <input type="text" name="contact" value="<%= mentor.getContactNo() %>" required><br>
+        Expertise: <input type="text" name="expertise" value="<%= mentor.getExpertise() %>"><br>
+        Bio: <textarea name="bio"><%= mentor.getBio() %></textarea><br>
+        Experience: <input type="number" name="experience" value="<%= mentor.getExperienceYears() %>"><br>
+        <button type="submit">Update Profile</button>
+    </form>
+</body>
+</html>

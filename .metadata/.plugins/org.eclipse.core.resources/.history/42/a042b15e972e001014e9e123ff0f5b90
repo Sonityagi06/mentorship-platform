@@ -1,0 +1,135 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="java.util.*, com.hrit.mentorship_platform.model.User,com.hrit.mentorship_platform.dao.MenteeDao" %>
+<%
+    if (session == null || session.getAttribute("user") == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+
+    User user = (User) session.getAttribute("user");
+    int senderId = user.getId(); // mentee user_login.id
+    
+    int receiverId = Integer.parseInt(request.getParameter("receiverId")); // Mentor's user_id
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Chat</title>
+    <link rel="stylesheet" href="css/chat-style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+        }
+        .chat-container {
+            max-width: 700px;
+            margin: 50px auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .messages {
+            height: 400px;
+            overflow-y: scroll;
+            padding: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .message {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            max-width: 70%;
+            clear: both;
+        }
+        .sent {
+            background: #dcf8c6;
+            float: right;
+        }
+        .received {
+            background: #f1f0f0;
+            float: left;
+        }
+        .input-box {
+            display: flex;
+            padding: 15px;
+        }
+        .input-box input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        .input-box button {
+            margin-left: 10px;
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .input-box button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="messages" id="messages">
+        <!-- Messages will be loaded here dynamically -->
+    </div>
+    <div class="input-box">
+        <input type="text" id="messageInput" placeholder="Type your message...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script> 
+    const senderId = <%= senderId %>;  
+    const receiverId = <%= receiverId %>; 
+
+    function loadMessages() {
+        fetch(`FetchMessagesServlet?senderId=${senderId}&receiverId=${receiverId}`)
+            .then(response => response.json())
+            .then(data => {
+                const messagesDiv = document.getElementById('messages');
+                messagesDiv.innerHTML = '';
+                data.forEach(msg => {
+                    const div = document.createElement('div');
+                    div.className = 'message ' + (msg.senderId === senderId ? 'sent' : 'received');
+                    div.textContent = msg.content;
+                    messagesDiv.appendChild(div);
+                });
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            });
+    }
+
+    function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const message = input.value.trim();
+        if (message === '') return;
+
+        // Do not send senderId — server will take from session
+        fetch('SendMessageServlet', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `senderId=${senderId}&receiver_id=${receiverId}&message=${encodeURIComponent(message)}`
+        })
+        .then(() => {
+            input.value = '';
+            loadMessages();
+        });
+    }
+
+    loadMessages();
+    setInterval(loadMessages, 2000);
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,97 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" 
+         import="java.util.*, com.hrit.mentorship_platform.model.User, com.hrit.mentorship_platform.dao.MentorDao, com.hrit.mentorship_platform.dao.AppointmentDao" %>
+<%
+    if (session == null || session.getAttribute("user") == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+
+    User user = (User) session.getAttribute("user");
+    int userId = user.getId();
+
+    MentorDao mentorDao = new MentorDao();
+    int mentorId = mentorDao.getMentorIdByUserId(userId);
+    
+    //System.out.println(mentorId);
+
+    AppointmentDao appointmentDao = new AppointmentDao();
+    List<User> mentees = appointmentDao.getMenteesForMentor(mentorId);
+    //System.out.println(mentees.size());
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Mentor Messages</title>
+    <link rel="stylesheet" href="css/dashboard.css"> <!-- if exists -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .mentee-card {
+            padding: 15px;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background: #f9f9f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .mentee-card a {
+            text-decoration: none;
+            padding: 8px 14px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .mentee-card a:hover {
+            background-color: #45a049;
+        }
+        .no-convo {
+            text-align: center;
+            color: gray;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Message Mentees</h2>
+
+    <% if (mentees == null || mentees.isEmpty()) { %>
+        <p class="no-convo">No conversations found.</p>
+    <% } else { %>
+        <% for (User mentee : mentees) { %>
+            <div class="mentee-card">
+                <div>
+                    <strong><%= mentee.getName() %></strong><br>
+                    Mentee User_ID: <%= mentee.getId() %>
+                </div>
+                <a href="mentor-chat.jsp?receiverId=<%= mentee.getId() %>">Chat with <%= mentee.getName() %></a>
+            </div>
+        <% } %>
+    <% } %>
+</div>
+
+</body>
+</html>

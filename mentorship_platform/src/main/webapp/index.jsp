@@ -1,0 +1,89 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Mentorship Platform | Home</title>
+    <link rel="stylesheet" href="css/home.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        .hero .icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        .hero h1 {
+            font-size: 42px;
+        }
+        .hero p {
+            font-size: 20px;
+        }
+        .feature-card:hover {
+            transform: scale(1.05);
+            transition: transform 0.3s ease-in-out;
+        }
+        .btn {
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="icon">
+            <i class="fas fa-brain"></i>
+        </div>
+        <h1>Welcome to Mentorship Platform</h1>
+        <p>Connect. Learn. Grow.</p>
+        <div class="hero-buttons">
+            <a href="register.jsp" class="btn">Register</a>
+            <a href="login.jsp" class="btn">Login</a>
+        </div>
+    </header>
+
+    <!-- About Section -->
+    <section class="about">
+        <h2>Why Join Us?</h2>
+        <p>We provide a dynamic platform where mentors share knowledge and mentees seek guidance. Whether you're seeking career advice or looking to help others, we connect you with the right people.</p>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="feature-card">
+            <i class="fas fa-user-graduate fa-2x"></i>
+            <h3>For Mentees</h3>
+            <p>Find experienced mentors to guide your academic or professional journey.</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-chalkboard-teacher fa-2x"></i>
+            <h3>For Mentors</h3>
+            <p>Share your expertise and give back by mentoring the next generation.</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-comments fa-2x"></i>
+            <h3>Conversations</h3>
+            <p>Seamless communication through appointment booking and feedback channels.</p>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials">
+        <h2>User Testimonials</h2>
+        <div class="testimonial">
+            <p>"This platform helped me connect with a mentor who guided me through my final year project!"</p>
+            <span>- Priya, BTech Student</span>
+        </div>
+        <div class="testimonial">
+            <p>"It’s fulfilling to share my industry experience with students. Highly recommend!"</p>
+            <span>- Rajeev, Software Engineer</span>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2025 Mentorship Platform | Designed by QuadSynk</p>
+    </footer>
+</body>
+</html>

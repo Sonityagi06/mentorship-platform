@@ -1,0 +1,5 @@
+package com.hrit.mentorship_platform.servlet;
+
+public class UpdateAppointmentStatusServlet {
+
+}

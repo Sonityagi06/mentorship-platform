@@ -1,0 +1,40 @@
+package com.hrit.mentorship_platform.servlet;
+
+import java.io.IOException;
+
+import com.hrit.mentorship_platform.dao.MentorDao;
+import com.hrit.mentorship_platform.model.Mentor;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+public class UpdateMentorProfileServlet extends HttpServlet{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int mentorId = Integer.parseInt(request.getParameter("mentorId"));
+        String name = request.getParameter("name");
+        String contact = request.getParameter("contact");
+        String expertise = request.getParameter("expertise");
+        String bio = request.getParameter("bio");
+        int experience = Integer.parseInt(request.getParameter("experience"));
+
+        Mentor mentor = new Mentor(mentorId, name, contact, expertise, bio, experience);
+
+        MentorDao dao = new MentorDao();
+        boolean updated = dao.updateMentorProfile(mentor);
+
+        if (updated) {
+            response.sendRedirect("mentor-dashboard.jsp?msg=updated");
+        } else {
+            response.sendRedirect("edit-mentor-profile.jsp?msg=error");
+        }
+    }
+
+
+}

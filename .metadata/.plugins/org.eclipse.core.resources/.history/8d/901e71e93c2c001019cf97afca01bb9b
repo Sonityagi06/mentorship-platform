@@ -1,0 +1,57 @@
+package com.hrit.mentorship_platform.servlet;
+
+import com.hrit.mentorship_platform.dao.AppointmentDao;
+import com.hrit.mentorship_platform.model.Appointment;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.sql.Date;
+import java.sql.Time;
+
+@WebServlet("/book-appointment")
+public class BookAppointmentServlet extends HttpServlet {
+
+    private static final long serialVersionUID = 1L;
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            // Get the mentee's ID from session
+            Integer menteeIdObj = (Integer) request.getSession().getAttribute("user_id");
+
+            if (menteeIdObj == null) {
+                response.sendRedirect("login.jsp?error=session_expired");
+                return;
+            }
+
+            int menteeId = menteeIdObj.intValue();
+
+            // Get mentor ID, date, time, and topic from the request
+            int mentorId = Integer.parseInt(request.getParameter("mentorId"));
+            Date date = Date.valueOf(request.getParameter("date"));
+            Time time = Time.valueOf(request.getParameter("time") + ":00");
+            String topic = request.getParameter("topic");
+            String status = "Pending";
+
+            // Create a new Appointment object
+            Appointment appointment = new Appointment(mentorId, menteeId, date, time, topic, status);
+
+            // Save to DB
+            AppointmentDao appointmentDAO = new AppointmentDao();
+            boolean success = appointmentDAO.bookAppointment(appointment);
+
+            if (success) {
+                response.sendRedirect("mentee-appointments.jsp?success=true");
+            } else {
+                response.sendRedirect("mentee-dashboard.jsp?error=booking_failed");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("mentee-dashboard.jsp?error=exception");
+        }
+    }
+}

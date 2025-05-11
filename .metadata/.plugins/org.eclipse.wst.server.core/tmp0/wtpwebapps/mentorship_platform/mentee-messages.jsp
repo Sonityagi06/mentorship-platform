@@ -1,0 +1,79 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" 
+    import="java.util.*, com.hrit.mentorship_platform.model.User, com.hrit.mentorship_platform.dao.MessageDao,com.hrit.mentorship_platform.dao.MenteeDao" %>
+<%
+    if (session == null || session.getAttribute("user") == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+
+    // Get the logged-in user details (mentee)
+    User user = (User) session.getAttribute("user");
+    int userId = user.getId(); // This is the logged-in user's user_id
+    //System.out.println(userId);
+    MenteeDao menteeDao = new MenteeDao();
+    int menteeId = menteeDao.getMenteeIdByUserId(userId);
+   // System.out.println(menteeId);
+    
+    // Use the MessageDao to fetch chat partners
+    MessageDao messageDao = new MessageDao();
+    List<User> chatPartners = messageDao.getChatPartners(menteeId);
+
+    // Print the size for debugging (remove in production)
+    //System.out.println("Chat Partners Size: " + chatPartners.size());
+%>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Messages</title>
+    <link rel="stylesheet" href="css/mentee-dashboard.css">
+    <style>
+        .chat-list {
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 20px;
+            border-radius: 8px;
+            background: #f9f9f9;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .chat-list h2 {
+            text-align: center;
+        }
+        .chat-link {
+            display: block;
+            padding: 10px 15px;
+            margin: 10px 0;
+            background: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .chat-link:hover {
+            background: #e6f7ff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-list">
+        <h2>Chat with Mentors</h2>
+        
+        <% if (chatPartners != null && !chatPartners.isEmpty()) {
+               for (User mentor : chatPartners) { %>
+                  <a href="chat.jsp?receiverId=<%= mentor.getId() %>" class="chat-link">
+                    Chat with <%= mentor.getName() %>
+                  </a>
+        <%     }
+           } else { %>
+               <p>No mentors found with whom you have an appointment.</p>
+        <% } %>
+    </div>
+
+</body>
+</html>

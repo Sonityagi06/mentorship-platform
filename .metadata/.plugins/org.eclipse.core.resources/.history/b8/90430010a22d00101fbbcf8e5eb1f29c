@@ -1,0 +1,49 @@
+<%@ page import="java.util.*, com.hrit.mentorship_platform.dao.*, com.hrit.mentorship_platform.model.*" %>
+<%
+    User currentUser = (User) session.getAttribute("user");
+    if (currentUser == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+
+    int receiverId = 0;
+    String receiverIdStr = request.getParameter("receiverId");
+    if (receiverIdStr != null) {
+        receiverId = Integer.parseInt(receiverIdStr);
+    }
+
+    UserDao userDao = new UserDao();
+    MessageDao messageDao = new MessageDao();
+    List<User> mentorList = userDao.getAllMentorsExceptCurrent(currentUser.getId());
+    List<Message> conversation = receiverId != 0 ? messageDao.getMessagesBetween(currentUser.getId(), receiverId) : new ArrayList<>();
+%>
+
+<html>
+<head><title>Chat</title></head>
+<body>
+    <h2>Start Chat</h2>
+    <ul>
+        <% for (User u : mentorList) { %>
+            <li><a href="chat.jsp?receiverId=<%= u.getId() %>"><%= u.getName() %></a></li>
+        <% } %>
+    </ul>
+
+    <% if (receiverId != 0) { %>
+        <h3>Conversation</h3>
+        <div style="background:#eee; padding:10px;">
+            <% for (Message m : conversation) { %>
+                <p><b><%= (m.getSenderId() == currentUser.getId()) ? "You" : "Them" %>:</b> <%= m.getMessage() %> <i>(<%= m.getTimestamp() %>)</i></p>
+            <% } %>
+        </div>
+
+        <form action="sendMessage" method="post">
+            <input type="hidden" name="senderId" value="<%= currentUser.getId() %>">
+            <input type="hidden" name="receiverId" value="<%= receiverId %>">
+            <textarea name="message" rows="3" cols="40"></textarea><br>
+            <button type="submit">Send</button>
+        </form>
+    <% } else { %>
+        <p>Select a mentor to start chatting.</p>
+    <% } %>
+</body>
+</html>

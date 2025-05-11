@@ -1,0 +1,35 @@
+package com.hrit.mentorship_platform.servlet;
+
+import java.io.IOException;
+
+import com.hrit.mentorship_platform.dao.AppointmentDao;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+public class UpdateAppointmentStatusServlet extends HttpServlet {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        int appointmentId = Integer.parseInt(request.getParameter("appointmentId"));
+        String status = request.getParameter("action"); // "Accepted" or "Rejected"
+
+        AppointmentDao dao = new AppointmentDao();
+        boolean result = dao.updateAppointmentStatus(appointmentId, status);
+
+        if (result) {
+            response.sendRedirect("mentor-appointments.jsp?msg=updated");
+        } else {
+            response.sendRedirect("mentor-appointments.jsp?msg=error");
+        }
+    }
+
+}

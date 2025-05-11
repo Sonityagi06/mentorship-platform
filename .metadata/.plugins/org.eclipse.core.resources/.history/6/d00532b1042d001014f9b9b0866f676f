@@ -1,0 +1,5 @@
+package com.hrit.mentorship_platform.dao;
+
+public class MessageDao {
+
+}

@@ -1,0 +1,23 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Mentorship Platform | Home</title>
+    <link rel="stylesheet" href="css/home.css"> <!-- External CSS file -->
+</head>
+<body>
+    <div class="home-container">
+        <div class="logo-box">
+            <img src="images/logo.png" alt="Mentorship Logo" class="logo">
+        </div>
+        <h1>Welcome to the Mentorship Platform</h1>
+        <p>Your bridge to guidance, growth, and great mentors.</p>
+        <div class="buttons">
+            <a href="register.jsp" class="btn">Register</a>
+            <a href="login.jsp" class="btn">Login</a>
+        </div>
+    </div>
+</body>
+</html>
+

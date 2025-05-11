@@ -1,0 +1,14 @@
+package com.hrit.mentorship_platform.servlet;
+
+import jakarta.servlet.http.HttpServlet;
+
+
+
+public class UpdateMenteeProfileServlet extends HttpServlet{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+}

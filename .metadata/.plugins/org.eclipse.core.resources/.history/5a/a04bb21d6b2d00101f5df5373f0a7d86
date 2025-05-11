@@ -1,0 +1,88 @@
+<%@ page import="com.hrit.mentorship_platform.model.User, com.hrit.mentorship_platform.dao.MessageDao" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    User currentUser = (User) session.getAttribute("user");
+    if (currentUser == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+
+    MessageDao messageDao = new MessageDao();
+    java.util.List<User> chatPartners = messageDao.getChatPartners(currentUser.getId());
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Chats</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #eef2f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .chat-list-container {
+            max-width: 600px;
+            margin: auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+
+        ul.chat-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        ul.chat-list li {
+            padding: 12px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        ul.chat-list li a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+            display: block;
+        }
+
+        ul.chat-list li a:hover {
+            color: #0056b3;
+        }
+
+        .empty-msg {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>My Chat Partners</h2>
+
+    <div class="chat-list-container">
+        <% if (chatPartners != null && !chatPartners.isEmpty()) { %>
+            <ul class="chat-list">
+                <% for (User partner : chatPartners) { %>
+                    <li>
+                        <a href="chat.jsp?receiverId=<%= partner.getId() %>">
+                            <%= partner.getName() %>
+                        </a>
+                    </li>
+                <% } %>
+            </ul>
+        <% } else { %>
+            <div class="empty-msg">No chat history found.</div>
+        <% } %>
+    </div>
+
+</body>
+</html>

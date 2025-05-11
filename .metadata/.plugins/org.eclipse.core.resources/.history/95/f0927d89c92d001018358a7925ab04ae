@@ -1,0 +1,62 @@
+package com.hrit.mentorship_platform.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.hrit.mentorship_platform.dbconnection.DBConnection;
+import com.hrit.mentorship_platform.model.Message;
+
+public class MessageDao {
+	
+	public boolean sendMessage(int senderId, int receiverId, String messageContent) {
+	    String sql = "INSERT INTO messages (sender_id, receiver_id, content,timestamp) VALUES (?, ?, ?,NOW())";
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+	        stmt.setInt(1, senderId);
+	        stmt.setInt(2, receiverId);
+	        stmt.setString(3, messageContent);
+	        int rowsAffected = stmt.executeUpdate();
+	        return rowsAffected > 0;
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return false;
+	}
+	
+	public List<Message> getMessagesBetween(int senderId, int receiverId) {
+	    List<Message> messages = new ArrayList<>();
+	    String sql = "SELECT * FROM messages " +
+	                 "WHERE (sender_id = ? AND receiver_id = ?) " +
+	                 "   OR (sender_id = ? AND receiver_id = ?) " +
+	                 "ORDER BY timestamp ASC";
+
+	    try (Connection conn = DBConnection.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+	        stmt.setInt(1, senderId);
+	        stmt.setInt(2, receiverId);
+	        stmt.setInt(3, receiverId);
+	        stmt.setInt(4, senderId);
+
+	        ResultSet rs = stmt.executeQuery();
+	        while (rs.next()) {
+	            Message msg = new Message();
+	            msg.setId(rs.getInt("id"));
+	            msg.setSenderId(rs.getInt("sender_id"));
+	            msg.setReceiverId(rs.getInt("receiver_id"));
+	            msg.setMessage(rs.getString("message"));
+	            msg.setTimestamp(rs.getTimestamp("timestamp"));
+	            messages.add(msg);
+	        }
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    return messages;
+	}
+
+}

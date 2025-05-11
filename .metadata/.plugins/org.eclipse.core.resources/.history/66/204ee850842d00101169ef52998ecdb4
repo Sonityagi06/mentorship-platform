@@ -1,0 +1,211 @@
+<%@ page import="com.hrit.mentorship_platform.model.User, com.hrit.mentorship_platform.dao.UserDao" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    User currentUser = (User) session.getAttribute("user");
+    if (currentUser == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+
+    String receiverIdParam = request.getParameter("receiverId");
+    if (receiverIdParam == null || receiverIdParam.trim().isEmpty()) {
+        out.println("Receiver not specified.");
+        return;
+    }
+
+    int receiverId = Integer.parseInt(receiverIdParam);
+    if (receiverId == currentUser.getId()) {
+        out.println("You can't chat with yourself.");
+        return;
+    }
+
+    UserDao userDao = new UserDao();
+    User receiver = userDao.getUserById(receiverId);
+    if (receiver == null) {
+        out.println("Receiver not found.");
+        return;
+    }
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat with <%= receiver.getName() %></title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #eef2f5;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        #chat-box {
+            width: 90%;
+            max-width: 800px;
+            height: 400px;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background: #fff;
+            padding: 10px;
+            overflow-y: scroll;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .message {
+            margin: 8px 0;
+            padding: 8px 12px;
+            max-width: 60%;
+            border-radius: 10px;
+            clear: both;
+            word-wrap: break-word;
+        }
+
+        .me {
+            background-color: #d1e7ff;
+            float: right;
+            text-align: right;
+        }
+
+        .them {
+            background-color: #e2ffe2;
+            float: left;
+            text-align: left;
+        }
+
+        #chat-form {
+            width: 90%;
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            gap: 10px;
+        }
+
+        #message {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            background: #007bff;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Chat with <%= receiver.getName() %></h2>
+
+<div style="display: flex; max-width: 1000px; margin: auto;">
+    <div id="chat-partners" style="width: 25%; background: #f1f1f1; border-right: 1px solid #ccc; padding: 10px;">
+        <h3>Chats</h3>
+        <ul id="partner-list" style="list-style: none; padding: 0;"></ul>
+    </div>
+    <div style="flex: 1;">
+        <h2>Chat with <span id="chat-name"><%= receiver.getName() %></span></h2>
+        <div id="chat-box"></div>
+        <form id="chat-form">
+            <input type="text" id="message" placeholder="Type your message..." required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+</div>
+
+
+
+
+
+<script>
+    const senderId = <%= currentUser.getId() %>;
+    const receiverId = <%= receiver.getId() %>;
+
+    function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.innerText = text;
+        return div.innerHTML;
+    }
+
+    function loadMessages() {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", "ChatServlet?senderId=" + senderId + "&receiverId=" + receiverId, true);
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                const chatBox = document.getElementById("chat-box");
+                chatBox.innerHTML = "";
+                const messages = JSON.parse(xhr.responseText);
+                messages.forEach(msg => {
+                    const msgDiv = document.createElement("div");
+                    msgDiv.className = "message " + (msg.senderId === senderId ? "me" : "them");
+                    msgDiv.innerHTML = escapeHtml(msg.message);
+                    chatBox.appendChild(msgDiv);
+                });
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        };
+        xhr.send();
+    }
+
+    // Initial load
+    loadMessages();
+
+    // Reload every 3 seconds
+    setInterval(loadMessages, 3000);
+
+    // Send message
+    document.getElementById("chat-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        const messageInput = document.getElementById("message");
+        const message = messageInput.value.trim();
+        if (message === "") return;
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "SendMessageServlet", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                messageInput.value = "";
+                loadMessages();
+            }
+        };
+        xhr.send("senderId=" + senderId + "&receiverId=" + receiverId + "&message=" + encodeURIComponent(message));
+    });
+    
+    function loadChatPartners() {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", "GetChatPartnersServlet?userId=" + senderId, true);
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                const users = JSON.parse(xhr.responseText);
+                const partnerList = document.getElementById("partner-list");
+                partnerList.innerHTML = "";
+                users.forEach(user => {
+                    const li = document.createElement("li");
+                    li.innerHTML = `<a href="chat.jsp?receiverId=${user.id}">${user.name}</a>`;
+                    partnerList.appendChild(li);
+                });
+            }
+        };
+        xhr.send();
+    }
+    loadChatPartners();  // Call this to populate partner list
+
+
+</script>
+
+</body>
+</html>

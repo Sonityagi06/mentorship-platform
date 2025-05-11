@@ -1,0 +1,49 @@
+package com.hrit.mentorship_platform.servlet;
+
+import com.hrit.mentorship_platform.dao.MessageDao;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+import java.io.IOException;
+
+@WebServlet("/send-message")
+public class SendMessageServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        // Step 1: Get sender_id from session
+        HttpSession session = request.getSession();
+        Integer senderId = (Integer) session.getAttribute("user_id");  // user_login.id
+
+        if (senderId == null) {
+            response.sendRedirect("login.jsp"); // User not logged in
+            return;
+        }
+
+        // Step 2: Get receiver_id and message text from form
+        String receiverIdStr = request.getParameter("receiver_id");
+        String messageText = request.getParameter("message");
+
+        if (receiverIdStr == null || messageText == null || messageText.trim().isEmpty()) {
+            response.getWriter().write("Invalid message or receiver.");
+            return;
+        }
+
+        int receiverId = Integer.parseInt(receiverIdStr);  // also user_login.id
+
+        // Step 3: Use DAO to save message
+        MessageDao messageDao = new MessageDao();
+        boolean success = messageDao.sendMessage(senderId, receiverId, messageText);
+
+        // Step 4: Redirect or error message
+        if (success) {
+            response.sendRedirect("chat.jsp?receiver_id=" + receiverId);
+        } else {
+            response.getWriter().write("Message sending failed. Please try again.");
+        }
+    }
+}

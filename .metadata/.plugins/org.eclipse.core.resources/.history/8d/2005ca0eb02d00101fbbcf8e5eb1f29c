@@ -1,0 +1,156 @@
+<%@ page import="java.util.*, com.hrit.mentorship_platform.model.User, com.hrit.mentorship_platform.dao.MessageDao" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    if (session == null || session.getAttribute("user") == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+
+    User mentee = (User) session.getAttribute("user");
+    MessageDao dao = new MessageDao();
+    List<User> chatPartners = dao.getChatPartnersFromAppointments(mentee.getId());
+%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Messages</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .chat-container {
+            display: flex;
+            border: 1px solid #ccc;
+            height: 500px;
+        }
+        .partner-list {
+            width: 250px;
+            border-right: 1px solid #ccc;
+            overflow-y: auto;
+            background: #f7f7f7;
+        }
+        .partner-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .partner-list li {
+            padding: 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+        }
+        .partner-list li:hover {
+            background-color: #ddd;
+        }
+        .chat-box {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+        }
+        #chatWithName {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        #messageArea {
+            flex: 1;
+            border: 1px solid #ccc;
+            padding: 10px;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+            background: #fdfdfd;
+        }
+        .sent {
+            text-align: right;
+            color: blue;
+            margin: 5px 0;
+        }
+        .received {
+            text-align: left;
+            color: green;
+            margin: 5px 0;
+        }
+        #messageInput {
+            padding: 10px;
+            width: 80%;
+        }
+        #sendButton {
+            padding: 10px 15px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Welcome, <%= mentee.getName() %>!</h2>
+<div class="chat-container">
+    <div class="partner-list">
+        <ul>
+            <% for(User partner : chatPartners) { %>
+                <li onclick="openChat(<%= mentee.getId() %>, <%= partner.getId() %>, '<%= partner.getName() %>')">
+                    <%= partner.getName() %>
+                </li>
+            <% } %>
+        </ul>
+    </div>
+
+    <div class="chat-box">
+        <div id="chatWithName">Select a user to start chatting</div>
+        <div id="messageArea"></div>
+        <div>
+            <input type="text" id="messageInput" placeholder="Type a message..." />
+            <button id="sendButton" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentSenderId = <%= mentee.getId() %>;
+    let currentReceiverId = null;
+
+    function openChat(senderId, receiverId, receiverName) {
+        currentReceiverId = receiverId;
+        document.getElementById("chatWithName").innerText = "Chat With: " + receiverName;
+        fetchMessages();
+    }
+
+    function fetchMessages() {
+        if (!currentReceiverId) return;
+        fetch(`GetMessagesServlet?senderId=${currentSenderId}&receiverId=${currentReceiverId}`)
+            .then(response => response.json())
+            .then(data => {
+                const chatBox = document.getElementById("messageArea");
+                chatBox.innerHTML = "";
+                data.forEach(msg => {
+                    const div = document.createElement("div");
+                    div.className = msg.senderId === currentSenderId ? "sent" : "received";
+                    div.innerText = msg.message;
+                    chatBox.appendChild(div);
+                });
+                chatBox.scrollTop = chatBox.scrollHeight;
+            });
+    }
+
+    function sendMessage() {
+        const message = document.getElementById("messageInput").value.trim();
+        if (!message || !currentReceiverId) return;
+
+        fetch("SendMessageServlet", {
+            method: "POST",
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `senderId=${currentSenderId}&receiverId=${currentReceiverId}&message=${encodeURIComponent(message)}`
+        }).then(() => {
+            document.getElementById("messageInput").value = "";
+            fetchMessages();
+        });
+    }
+
+    // Optional: Auto-refresh chat every 3 seconds
+    setInterval(fetchMessages, 3000);
+</script>
+
+</body>
+</html>

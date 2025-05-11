@@ -1,0 +1,75 @@
+/* Base styling */
+@charset "UTF-8";
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f7fa;
+}
+
+/* Container for main content */
+.container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Page heading */
+h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+/* Appointment card styling */
+.appointment-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #fafafa;
+    transition: all 0.3s ease-in-out;
+}
+
+.appointment-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Individual details */
+.appointment-card h4 {
+    margin: 0 0 10px 0;
+    color: #444;
+}
+
+.appointment-card p {
+    margin: 5px 0;
+    color: #555;
+}
+
+/* Status label */
+.status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+/* Status colors */
+.status.pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status.accepted {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status.rejected {
+    background-color: #f8d7da;
+    color: #721c24;
+}

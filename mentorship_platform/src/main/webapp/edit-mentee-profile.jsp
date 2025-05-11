@@ -1,0 +1,33 @@
+<%@ page import="com.hrit.mentorship_platform.model.Mentee" %>
+<%@ page import="com.hrit.mentorship_platform.dao.MenteeDao" %>
+<%@ page import="com.hrit.mentorship_platform.model.User" %>
+<%
+    if (session == null || session.getAttribute("user") == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+
+User user = (User) session.getAttribute("user");
+MenteeDao menteeDao = new MenteeDao();
+Mentee mentee = menteeDao.getMenteeByUserId(user.getId());
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="css/edit-mentor-profile.css">
+</head>
+<body>
+    <h2>Edit Your Profile</h2>
+    <form action="update-mentee-profile" method="post">
+        <input type="hidden" name="menteeId" value="<%= mentee.getId() %>">
+        Name: <input type="text" name="name" value="<%= mentee.getName() %>" required><br>
+        Contact No: <input type="text" name="contact" value="<%= mentee.getContact_no() %>" required><br>
+        Course <input type="text" name="course" value="<%= mentee.getCourse() %>"><br>
+        Bio: <textarea name="bio"><%= mentee.getBio() %></textarea><br>
+        
+        <button type="submit">Update Profile</button>
+    </form>
+</body>
+</html>

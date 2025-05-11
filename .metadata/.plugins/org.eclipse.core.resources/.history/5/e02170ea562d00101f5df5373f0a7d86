@@ -1,0 +1,116 @@
+<%@ page import="com.hrit.mentorship_platform.model.User" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    User currentUser = (User) session.getAttribute("user");
+    if (currentUser == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+
+    String receiverIdParam = request.getParameter("receiverId");
+    if (receiverIdParam == null) {
+        out.println("Receiver not specified.");
+        return;
+    }
+
+    int receiverId = Integer.parseInt(receiverIdParam);
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #chat-box {
+            width: 90%;
+            height: 400px;
+            border: 1px solid #ccc;
+            overflow-y: scroll;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+        }
+        #chat-box .message {
+            margin: 5px 0;
+        }
+        #chat-box .me {
+            text-align: right;
+            color: blue;
+        }
+        #chat-box .them {
+            text-align: left;
+            color: green;
+        }
+        #chat-form {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Chat with User ID: <%= receiverId %></h2>
+
+<div id="chat-box"></div>
+
+<form id="chat-form">
+    <input type="text" id="message" placeholder="Type your message..." required style="flex: 1;">
+    <button type="submit">Send</button>
+</form>
+
+<script>
+    const senderId = <%= currentUser.getId() %>;
+    const receiverId = <%= receiverId %>;
+
+    // Function to fetch and display messages
+    function loadMessages() {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", "ChatServlet?senderId=" + senderId + "&receiverId=" + receiverId, true);
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                const chatBox = document.getElementById("chat-box");
+                chatBox.innerHTML = "";
+                const messages = JSON.parse(xhr.responseText);
+                messages.forEach(msg => {
+                    const msgDiv = document.createElement("div");
+                    msgDiv.className = "message " + (msg.senderId === senderId ? "me" : "them");
+                    msgDiv.innerText = msg.message;
+                    chatBox.appendChild(msgDiv);
+                });
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        };
+        xhr.send();
+    }
+
+    // Initial load
+    loadMessages();
+
+    // Reload every 3 seconds
+    setInterval(loadMessages, 3000);
+
+    // Handle message sending
+    document.getElementById("chat-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        const messageInput = document.getElementById("message");
+        const message = messageInput.value.trim();
+        if (message === "") return;
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "SendMessageServlet", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                messageInput.value = "";
+                loadMessages();
+            }
+        };
+        xhr.send("senderId=" + senderId + "&receiverId=" + receiverId + "&message=" + encodeURIComponent(message));
+    });
+</script>
+
+</body>
+</html>

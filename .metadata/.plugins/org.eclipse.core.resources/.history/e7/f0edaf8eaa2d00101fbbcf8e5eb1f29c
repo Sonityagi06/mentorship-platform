@@ -1,0 +1,165 @@
+<%@ page import="com.hrit.mentorship_platform.model.User" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    User user = (User) session.getAttribute("user");
+    if (user == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+
+    int senderId = user.getId();
+    String receiverIdStr = request.getParameter("receiverId");
+    if (receiverIdStr == null) {
+        out.println("<h3>No conversation selected.</h3>");
+        return;
+    }
+
+    int receiverId = Integer.parseInt(receiverIdStr);
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f3f3;
+            margin: 0;
+            padding: 0;
+        }
+
+        .chat-container {
+            width: 60%;
+            margin: 50px auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            font-size: 20px;
+        }
+
+        .chat-box {
+            height: 400px;
+            overflow-y: scroll;
+            padding: 15px;
+            background: #e9f5ee;
+        }
+
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 70%;
+            clear: both;
+        }
+
+        .sent {
+            background-color: #d4edda;
+            float: right;
+            text-align: right;
+        }
+
+        .received {
+            background-color: #ffffff;
+            float: left;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            background: #f8f8f8;
+        }
+
+        #msg-input {
+            flex-grow: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            margin-left: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+<div class="chat-container">
+    <div class="chat-header">
+        Chat with User ID: <%= receiverId %>
+    </div>
+
+    <div class="chat-box" id="chat-box">
+        <!-- Messages will appear here -->
+    </div>
+
+    <div class="chat-input">
+        <input type="text" id="msg-input" placeholder="Type your message here..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+    let senderId = <%= senderId %>;
+    let receiverId = <%= receiverId %>;
+
+    function loadMessages() {
+        $.get("GetMessagesServlet", {
+            senderId: senderId,
+            receiverId: receiverId
+        }, function(data) {
+            $('#chat-box').html('');
+            data.forEach(msg => {
+                const className = msg.senderId === senderId ? "message sent" : "message received";
+                $('#chat-box').append(`<div class="${className}">${msg.message}</div>`);
+            });
+            $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
+        });
+    }
+
+    function sendMessage() {
+        const message = $('#msg-input').val().trim();
+        if (message === "") return;
+
+        $.post("SendMessageServlet", {
+            senderId: senderId,
+            receiverId: receiverId,
+            message: message
+        }, function() {
+            $('#msg-input').val('');
+            loadMessages();
+        });
+    }
+
+    // Auto-refresh every 2 seconds
+    setInterval(loadMessages, 2000);
+    $(document).ready(loadMessages);
+</script>
+
+</body>
+</html>

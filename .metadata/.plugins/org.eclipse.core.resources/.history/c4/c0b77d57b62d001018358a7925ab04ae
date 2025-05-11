@@ -1,0 +1,138 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
+         import="java.util.*, com.hrit.mentorship_platform.dao.MessageDao, com.hrit.mentorship_platform.model.Message, com.hrit.mentorship_platform.model.User" %>
+
+<%
+    if (session == null || session.getAttribute("user") == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+
+    // Fetch the current user (mentee)
+    User mentee = (User) session.getAttribute("user");
+    int menteeId = mentee.getId();
+
+    // Get the receiverId (mentor)
+    int receiverId = Integer.parseInt(request.getParameter("receiverId"));
+
+    // Fetch messages between mentee and mentor
+    MessageDao messageDao = new MessageDao();
+    List<Message> conversation = messageDao.getConversation(menteeId, receiverId);
+
+    // Get mentor's details
+    User mentor = messageDao.getUserDetails(receiverId);
+%>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat with <%= mentor.getName() %></title>
+    <link rel="stylesheet" href="css/mentee-dashboard.css">
+    <style>
+        /* Chat box style */
+        .chat-container {
+            width: 70%;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .chat-box {
+            max-height: 400px;
+            overflow-y: scroll;
+            margin-bottom: 20px;
+        }
+        .message {
+            margin: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            background: #e1f5fe;
+            color: #333;
+            max-width: 70%;
+            margin-left: auto;
+            margin-bottom: 10px;
+        }
+        .message.sent {
+            background: #c8e6c9;
+            margin-left: 0;
+        }
+        .input-box {
+            display: flex;
+            margin-top: 10px;
+        }
+        .input-box input {
+            width: 80%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .input-box button {
+            padding: 10px 15px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <h2>Chat with <%= mentor.getName() %></h2>
+    <div class="chat-box" id="chatBox">
+        <% for (Message msg : conversation) { %>
+            <div class="message <%= msg.getSenderId() == menteeId ? "sent" : "received" %>">
+                <%= msg.getContent() %>
+            </div>
+        <% } %>
+    </div>
+
+    <div class="input-box">
+        <input type="text" id="messageInput" placeholder="Type a message..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+</div>
+
+<script>
+    // Function to scroll chat box to bottom on message send
+    function scrollToBottom() {
+        var chatBox = document.getElementById("chatBox");
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Function to send message via AJAX
+    function sendMessage() {
+        var message = document.getElementById("messageInput").value;
+        var receiverId = <%= receiverId %>;
+
+        if (message.trim() != "") {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "SendMessageServlet", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+            // Send data to the server (message, senderId, receiverId)
+            xhr.send("message=" + encodeURIComponent(message) + "&senderId=" + <%= menteeId %> + "&receiverId=" + receiverId);
+
+            // On successful message send, append the message to the chat box
+            xhr.onload = function() {
+                if (xhr.status == 200) {
+                    // Append new message to chat box
+                    var newMessage = document.createElement("div");
+                    newMessage.classList.add("message", "sent");
+                    newMessage.innerHTML = message;
+
+                    document.getElementById("chatBox").appendChild(newMessage);
+                    document.getElementById("messageInput").value = ""; // clear input
+                    scrollToBottom();
+                }
+            };
+        }
+    }
+</script>
+
+</body>
+</html>

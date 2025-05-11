@@ -1,0 +1,25 @@
+<%@ page import="com.hrit.mentorship_platform.model.Message, com.hrit.mentorship_platform.dao.MessageDao, java.util.List" %>
+<%
+    int senderId = ((User) session.getAttribute("user")).getId(); // current user
+    int receiverId = Integer.parseInt(request.getParameter("user")); // other user
+
+    MessageDao dao = new MessageDao();
+    List<Message> chatList = dao.getConversation(senderId, receiverId);
+%>
+
+<h2>Chat</h2>
+<div style="border: 1px solid gray; height: 300px; overflow-y: scroll;">
+    <% for (Message m : chatList) { %>
+        <div style="margin: 5px; padding: 5px; background-color: <%= m.getSenderId() == senderId ? "#dcf8c6" : "#f1f0f0" %>;">
+            <strong><%= m.getSenderId() == senderId ? "You" : "Them" %>:</strong> <%= m.getMessage() %><br>
+            <small><%= m.getTimestamp() %></small>
+        </div>
+    <% } %>
+</div>
+
+<form action="send-message" method="post">
+    <input type="hidden" name="senderId" value="<%= senderId %>">
+    <input type="hidden" name="receiverId" value="<%= receiverId %>">
+    <input type="text" name="message" required>
+    <button type="submit">Send</button>
+</form>

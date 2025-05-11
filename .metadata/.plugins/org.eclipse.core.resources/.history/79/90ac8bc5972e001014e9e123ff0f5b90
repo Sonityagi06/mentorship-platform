@@ -1,0 +1,108 @@
+@charset "UTF-8";
+/* Chat container */
+.chat-container {
+    max-width: 600px;
+    margin: 40px auto;
+    background: #f4f4f9;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    height: 80vh;
+    overflow: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Message area */
+.messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background-color: #eaeef1;
+}
+
+/* Sent message */
+.message.sent {
+    align-self: flex-end;
+    background: #4caf50;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 16px 16px 0 16px;
+    max-width: 70%;
+    word-wrap: break-word;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Received message */
+.message.received {
+    align-self: flex-start;
+    background: #ffffff;
+    color: #333;
+    padding: 10px 16px;
+    border-radius: 16px 16px 16px 0;
+    max-width: 70%;
+    word-wrap: break-word;
+    border: 1px solid #ddd;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Input box */
+.input-box {
+    display: flex;
+    padding: 12px;
+    border-top: 1px solid #ccc;
+    background: #fff;
+}
+
+.input-box input[type="text"] {
+    flex: 1;
+    padding: 10px 14px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    outline: none;
+}
+
+.input-box button {
+    padding: 10px 16px;
+    margin-left: 10px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.input-box button:hover {
+    background-color: #45a049;
+}
+
+/* Scrollbar */
+.messages::-webkit-scrollbar {
+    width: 8px;
+}
+.messages::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 4px;
+}
+.messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .chat-container {
+        width: 90%;
+        height: 85vh;
+    }
+}

@@ -1,0 +1,65 @@
+package com.hrit.mentorship_platform.servlet;
+
+import com.hrit.mentorship_platform.dao.AppointmentDao;
+import com.hrit.mentorship_platform.dao.MenteeDao;
+import com.hrit.mentorship_platform.model.Appointment;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.sql.Date;
+import java.sql.Time;
+
+@WebServlet("/book-appointment")
+public class BookAppointmentServlet extends HttpServlet {
+
+    private static final long serialVersionUID = 1L;
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	try {
+            Integer userId = (Integer) request.getSession(false).getAttribute("user_id");
+            if (userId == null) {
+                request.setAttribute("errorMessage", "Session expired. Please log in again.");
+                request.getRequestDispatcher("login.jsp").forward(request, response);
+                return;
+            }
+
+            MenteeDao menteeDao = new MenteeDao();
+            int menteeId = menteeDao.getMenteeIdByUserId(userId);
+            request.getSession().setAttribute("mentee_id", menteeId);
+
+
+            if (menteeId == -1) {
+                request.setAttribute("errorMessage", "Mentee profile not found.");
+                request.getRequestDispatcher("book-appointment.jsp").forward(request, response);
+                return;
+            }
+            int mentorId = Integer.parseInt(request.getParameter("mentorId"));
+            
+            Date date = Date.valueOf(request.getParameter("date"));
+            Time time = Time.valueOf(request.getParameter("time") + ":00");
+            String topic = request.getParameter("topic");
+            String status = "Pending";
+
+            // Create a new Appointment object
+            Appointment appointment = new Appointment(mentorId, menteeId, date, time, topic, status);
+
+            // Save to DB
+            AppointmentDao appointmentDAO = new AppointmentDao();
+            boolean success = appointmentDAO.bookAppointment(appointment);
+
+            if (success) {
+                response.sendRedirect("mentee-appointments.jsp?success=true");
+            } else {
+                response.sendRedirect("mentee-dashboard.jsp?error=booking_failed");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("mentee-dashboard.jsp?error=exception");
+        }
+    }
+}

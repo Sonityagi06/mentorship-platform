@@ -1,0 +1,58 @@
+<%@ page import="java.util.*, com.hrit.mentorship_platform.dao.AppointmentDao, com.hrit.mentorship_platform.model.Appointment, com.hrit.mentorship_platform.model.User" %>
+<%
+    if (session == null || session.getAttribute("user") == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+    User user = (User) session.getAttribute("user");
+    int menteeId = user.getId();
+
+    AppointmentDao dao = new AppointmentDao();
+    List<Appointment> appointments = dao.getAppointmentsByMenteeId(menteeId);
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Appointments</title>
+    <link rel="stylesheet" href="css/mentee-appointments.css" />
+</head>
+<body>
+    <h2>Your Appointments</h2>
+
+    <%
+        String success = request.getParameter("success");
+        if ("true".equals(success)) {
+    %>
+        <p style="color: green;">Appointment booked successfully! Please wait for mentor approval.</p>
+    <%
+        }
+    %>
+
+    <table border="1">
+        <tr>
+            <th>Mentor ID</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Topic</th>
+            <th>Status</th>
+        </tr>
+
+        <% for (Appointment appt : appointments) { %>
+        <tr>
+            <td><%= appt.getMentorId() %></td>
+            <td><%= appt.getDate() %></td>
+            <td><%= appt.getTime() %></td>
+            <td><%= appt.getTopic() %></td>
+            <td style="color:
+                <%= "Accepted".equals(appt.getStatus()) ? "green" :
+                    "Rejected".equals(appt.getStatus()) ? "red" : "orange" %>;">
+                <%= appt.getStatus() %>
+            </td>
+        </tr>
+        <% } %>
+    </table>
+
+    <a href="mentee-dashboard.jsp">Back to Dashboard</a>
+</body>
+</html>

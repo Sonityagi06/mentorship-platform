@@ -1,0 +1,82 @@
+package com.hrit.mentorship_platform.servlet;
+
+	import java.io.IOException;
+
+import com.hrit.mentorship_platform.dao.MenteeDao;
+import com.hrit.mentorship_platform.dao.MentorDao;
+import com.hrit.mentorship_platform.dao.UserDao;
+	import com.hrit.mentorship_platform.model.User;
+
+	import jakarta.servlet.ServletException;
+	import jakarta.servlet.annotation.WebServlet;
+	import jakarta.servlet.http.HttpServlet;
+	import jakarta.servlet.http.HttpServletRequest;
+	import jakarta.servlet.http.HttpServletResponse;
+	import jakarta.servlet.http.HttpSession;
+
+	@WebServlet("/login")
+	public class LoginServlet extends HttpServlet {
+
+	    private static final long serialVersionUID = 1L;
+
+	    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+	            throws ServletException, IOException {
+
+	        String email = request.getParameter("email");
+	        String password = request.getParameter("password");
+
+	        UserDao userDao = new UserDao();
+	        User user = userDao.loginUser(email, password); // Implement loginUser method in UserDao
+
+	        if (user != null) {
+	            // Create a session for the logged-in user
+	            HttpSession session = request.getSession();
+	            session.setAttribute("user", user);
+	            session.setAttribute("user_id", user.getId());  // Assuming user.getId() returns the user ID
+
+
+	            String role = user.getRole();
+	            int userId = user.getId();
+	            
+	            // Redirect to the appropriate dashboard based on the user's role
+	            if ("mentor".equals(role)) {
+	                MentorDao mentorDao = new MentorDao();
+	                if (mentorDao.profileExists(userId)) {
+	                    response.sendRedirect("mentor-dashboard.jsp");
+	                } else {
+	                    response.sendRedirect("add-mentor.jsp");
+	                }
+	            } else if ("mentee".equals(role)) {
+	                MenteeDao menteeDao = new MenteeDao();
+	                if (menteeDao.profileExists(userId)) {
+	                    response.sendRedirect("mentee-dashboard.jsp");
+	                } else {
+	                    response.sendRedirect("add-mentee.jsp");
+	                }
+	            } else {
+	                response.getWriter().println("Invalid user role.");
+	            }
+
+	        } else {
+	        	 response.setContentType("text/html");
+	        	    response.getWriter().println(
+	        	        "<html><head><title>Login Failed</title>" +
+	        	        "<style>" +
+	        	        "body { font-family: Arial; background-color: #f2f2f2; padding: 20px; text-align: center; }" +
+	        	        ".btn { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; text-decoration: none; font-weight: bold; }" +
+	        	        ".btn:hover { background-color: #0056b3; }" +
+	        	        "</style></head><body>" +
+	        	        "<h2>Invalid credentials. Please try again or register.</h2>" +
+	        	        "<a href='register.jsp' class='btn'>Go to Register Page</a>" +
+	        	        "<a href='login.jsp' class='btn'>Go to login Page</a>" +
+	        	        "</body></html>"
+	        	    );
+	           
+	            
+	            
+	        }
+	    }
+	    }
+	
+
+

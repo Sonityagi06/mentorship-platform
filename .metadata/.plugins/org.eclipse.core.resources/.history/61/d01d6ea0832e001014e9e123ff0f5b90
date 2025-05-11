@@ -1,0 +1,57 @@
+package com.hrit.mentorship_platform.servlet;
+
+import java.io.IOException;
+
+import com.hrit.mentorship_platform.dao.UserDao;
+import com.hrit.mentorship_platform.model.User;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/register")
+public class RegisterServlet extends HttpServlet{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+	
+		String name = request.getParameter("name");
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+        String role = request.getParameter("role");
+        
+        User user = new User();
+        user.setName(name); // setting 'name' in the user object
+        user.setEmail(email);
+        user.setPassword(password);
+        user.setRole(role);
+        
+        UserDao userDao = new UserDao();
+        boolean result = userDao.registerUser(user);
+        
+        if (result) {
+        	response.sendRedirect("registration-success.jsp");
+        } else {
+            response.getWriter().write(
+            		
+            		 "<html><head><title>Registration Failed</title>" +
+     	        	        "<style>" +
+     	        	        "body { font-family: Arial; background-color: #f2f2f2; padding: 20px; text-align: center; }" +
+     	        	        ".btn { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; text-decoration: none; font-weight: bold; }" +
+     	        	        ".btn:hover { background-color: #0056b3; }" +	        	       
+     	        	        "</style></head><body>" +
+     	        	        "<h2>Registration Failed. Try again</h2>" +
+     	        	        "<a href='register.jsp' class='btn'>Go to register Page</a>" +
+     	        	        "<a href='login.jsp' class='btn'>Go to login Page</a>" +
+     	        	        "</body></html>"
+            		);
+        }
+	}
+
+}

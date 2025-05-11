@@ -1,0 +1,43 @@
+<%@page import="java.util.List"%>
+<%@page import="com.hrit.mentorship_platform.dao.MentorDao"%>
+<%@page import="com.hrit.mentorship_platform.model.Mentor"%>
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" %>
+
+<%
+    MentorDao mentorDao = new MentorDao();
+    List<Mentor> mentors = mentorDao.getAllMentors();
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Book Appointment</title>
+</head>
+<body>
+    <h2>Book an Appointment</h2>
+    <form action="create-appointment" method="post">
+        <label>Select Mentor:</label>
+        <select name="mentorId" required>
+            <option value="">-- Select Mentor --</option>
+            <% for (Mentor mentor : mentors) { %>
+                <option value="<%= mentor.getId() %>">
+                    <%= mentor.getName() %> - <%= mentor.getExpertise() %>
+                </option>
+            <% } %>
+        </select><br><br>
+
+        <label>Appointment Date-Time:</label>
+        <input type="datetime-local" name="appointmentDateTime" required><br><br>
+
+        <!-- Hidden menteeId if needed from session -->
+        <%
+            int menteeId = (session.getAttribute("menteeId") != null) ? (int) session.getAttribute("menteeId") : 1; // fallback
+        %>
+        <input type="hidden" name="menteeId" value="<%= menteeId %>">
+
+        <input type="submit" value="Book Appointment">
+    </form>
+</body>
+</html>

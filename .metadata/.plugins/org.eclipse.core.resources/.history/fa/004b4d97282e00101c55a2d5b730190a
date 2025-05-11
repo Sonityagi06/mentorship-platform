@@ -1,0 +1,154 @@
+package com.hrit.mentorship_platform.dao;
+
+import com.hrit.mentorship_platform.dbconnection.DBConnection;
+import com.hrit.mentorship_platform.model.Appointment;
+import com.hrit.mentorship_platform.model.User;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class AppointmentDao {
+
+    public AppointmentDao() {}
+
+    // Insert a new appointment
+    public boolean bookAppointment(Appointment appointment) {
+        boolean success = false;
+        String sql = "INSERT INTO appointments (mentor_id, mentee_id, date, time, topic, status) VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setInt(1, appointment.getMentorId());
+            stmt.setInt(2, appointment.getMenteeId());
+            stmt.setDate(3, appointment.getDate());
+            stmt.setTime(4, appointment.getTime());
+            stmt.setString(5, appointment.getTopic());
+            stmt.setString(6, appointment.getStatus());
+
+            int rows = stmt.executeUpdate();
+            success = rows > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return success;
+    }
+
+    // Get appointments by mentee ID
+    public List<Appointment> getAppointmentsByMenteeId(int menteeId) {
+        List<Appointment> list = new ArrayList<>();
+        String sql = "SELECT * FROM appointments WHERE mentee_id = ? ORDER BY date, time";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setInt(1, menteeId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Appointment appointment = new Appointment(
+                    rs.getInt("id"),
+                    rs.getInt("mentor_id"),
+                    rs.getInt("mentee_id"),
+                    rs.getDate("date"),
+                    rs.getTime("time"),
+                    rs.getString("topic"),
+                    rs.getString("status")
+                );
+                list.add(appointment);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    // Get appointments by mentor ID
+    public List<Appointment> getAppointmentsByMentorId(int mentorId) {
+        List<Appointment> list = new ArrayList<>();
+        String sql = "SELECT * FROM appointments WHERE mentor_id = ? ORDER BY date, time";
+
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
+
+            stmt.setInt(1, mentorId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Appointment appointment = new Appointment(
+                    rs.getInt("id"),
+                    rs.getInt("mentor_id"),
+                    rs.getInt("mentee_id"),
+                    rs.getDate("date"),
+                    rs.getTime("time"),
+                    rs.getString("topic"),
+                    rs.getString("status")
+                );
+                list.add(appointment);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    // Update the status of an existing appointment
+    public boolean updateAppointmentStatus(int appointmentId, String status) {
+        boolean rowUpdated = false;
+        String query = "UPDATE appointments SET status = ? WHERE id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+
+            ps.setString(1, status);
+            ps.setInt(2, appointmentId);
+
+            rowUpdated = ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return rowUpdated;
+    }
+
+    public List<User> getMenteesForMentor(int mentorId) {
+        List<User> mentees = new ArrayList<>();
+
+        String sql = "SELECT u.id, u.name, u.email, u.role " +
+                     "FROM user_login u " +
+                     "JOIN mentee m ON u.id = m.user_id " +
+                     "JOIN appointmenst a ON m.id = a.mentee_id " +
+                     "WHERE a.mentor_id = ? AND a.status = 'accepted' " +
+                     "GROUP BY u.id";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, mentorId);
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                User mentee = new User();
+                mentee.setId(rs.getInt("id"));
+                mentee.setName(rs.getString("name"));
+                mentee.setEmail(rs.getString("email"));
+                mentee.setRole(rs.getString("role"));
+                mentees.add(mentee);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return mentees;
+    }
+
+}

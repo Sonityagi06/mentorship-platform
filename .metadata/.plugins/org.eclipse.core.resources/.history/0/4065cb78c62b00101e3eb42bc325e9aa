@@ -1,0 +1,84 @@
+package com.hrit.mentorship_platform.model;
+
+import java.sql.Date;
+import java.sql.Time;
+
+public class Appointment {
+
+    private int id;
+    private int mentorId;
+    private int menteeId;
+    private Date date;
+    private Time time;
+    private String topic;
+    private String status;
+
+    // Constructors
+    public Appointment() {}
+
+    public Appointment(int mentorId, int menteeId, Date date, Time time, String status) {
+        this.mentorId = mentorId;
+        this.menteeId = menteeId;
+        this.date = date;
+        this.time = time;
+        this.status = status;
+    }
+
+    public Appointment(int id, int mentorId, int menteeId, Date date, Time time, String status) {
+        this.id = id;
+        this.mentorId = mentorId;
+        this.menteeId = menteeId;
+        this.date = date;
+        this.time = time;
+        this.status = status;
+    }
+
+    // Getters and Setters
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getMentorId() {
+        return mentorId;
+    }
+
+    public void setMentorId(int mentorId) {
+        this.mentorId = mentorId;
+    }
+
+    public int getMenteeId() {
+        return menteeId;
+    }
+
+    public void setMenteeId(int menteeId) {
+        this.menteeId = menteeId;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public Time getTime() {
+        return time;
+    }
+
+    public void setTime(Time time) {
+        this.time = time;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+}

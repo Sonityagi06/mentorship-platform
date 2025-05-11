@@ -1,0 +1,11 @@
+127.0.0.1 - - [30/Apr/2025:12:54:35 +0530] "GET / HTTP/1.1" 404 752
+0:0:0:0:0:0:0:1 - - [30/Apr/2025:12:54:52 +0530] "GET /mentorship_platform/mentee-dashboard.jsp HTTP/1.1" 302 -
+0:0:0:0:0:0:0:1 - - [30/Apr/2025:12:54:52 +0530] "GET /mentorship_platform/login.jsp HTTP/1.1" 200 3539
+0:0:0:0:0:0:0:1 - - [30/Apr/2025:12:55:08 +0530] "POST /mentorship_platform/login HTTP/1.1" 302 -
+0:0:0:0:0:0:0:1 - - [30/Apr/2025:12:55:08 +0530] "GET /mentorship_platform/mentee-dashboard.jsp HTTP/1.1" 200 2492
+0:0:0:0:0:0:0:1 - - [30/Apr/2025:12:55:10 +0530] "GET /mentorship_platform/find-mentor HTTP/1.1" 200 3239
+0:0:0:0:0:0:0:1 - - [30/Apr/2025:12:55:10 +0530] "GET /mentorship_platform/$%7Bmentor.profilePicture%7D HTTP/1.1" 404 804
+127.0.0.1 - - [30/Apr/2025:13:43:36 +0530] "GET / HTTP/1.1" 404 752
+0:0:0:0:0:0:0:1 - - [30/Apr/2025:13:43:36 +0530] "GET /mentorship_platform/mentee-find-mentor.jsp HTTP/1.1" 500 2748
+0:0:0:0:0:0:0:1 - - [30/Apr/2025:13:59:52 +0530] "GET /mentorship_platform/find-mentor HTTP/1.1" 200 615
+0:0:0:0:0:0:0:1 - - [30/Apr/2025:13:59:52 +0530] "GET /mentorship_platform/find-mentor HTTP/1.1" 200 615

@@ -1,0 +1,74 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="com.hrit.mentorship_platform.model.User," %>
+<%
+   
+    if (session == null || session.getAttribute("user") == null) {
+        response.sendRedirect("login.jsp"); // Redirect to login page if not logged in
+        return;
+    }
+    User user = (User) session.getAttribute("user"); // Get the user object from session
+%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentee_Dashboard</title>
+    <link rel="stylesheet" href="css/mentee-dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://img.icons8.com/ios-filled/50/000000/mentor.png">
+</head>
+<body>
+
+    <div class="dashboard-container">
+        
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <img src="images/mentee.jpg" alt="Profile" class="profile-img">
+                <h3><%= user.getName() %></h3>
+                <p><%= user.getRole().substring(0, 1).toUpperCase() + user.getRole().substring(1) %></p>
+            </div>
+            <ul class="menu">
+    <li><a href="mentee-dashboard.jsp">Dashboard</a></li>
+    <li><a href="find-mentor">Find Mentors</a></li>
+    <li><a href="mentee-appointments.jsp">View Appointments</a></li>
+    <li><a href="mentee-messages.jsp">Messages</a></li>
+    <li><a href="edit-mentee-profile.jsp">Profile</a></li>
+    <li><a href="<%= request.getContextPath() + "/logout" %>">Logout</a></li>
+</ul>
+
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="welcome-section">
+                <h2>Welcome, <%= user.getName() %>!</h2>
+                <p>Here's a quick overview of your activities.</p>
+            </div>
+            
+            <div class="cards-container">
+    <div class="card">
+        <img src="https://img.icons8.com/ios-filled/50/000000/search.png" alt="Find Mentors" class="card-icon">
+        <h3>Find Mentors</h3>
+        <p>Browse mentors and book appointments easily.</p>
+        <a href="find-mentor" class="btn">Find Mentors</a>
+    </div>
+    <div class="card">
+        <img src="https://img.icons8.com/ios-filled/50/000000/calendar.png" alt="Appointments" class="card-icon">
+        <h3>Your Appointments</h3>
+        <p>View and manage your upcoming appointments with mentors.</p>
+        <a href="mentee-appointments.jsp" class="btn">View Appointments</a>
+    </div>
+    <div class="card">
+        <img src="https://img.icons8.com/ios-filled/50/000000/comments.png" alt="Messages" class="card-icon">
+                    <h3>Your Messages</h3>
+                    <p>Communicate with your mentors and stay updated.</p>
+                <a href="chat.jsp" class="btn">View Messages</a>
+
+    </div>
+</div>
+
+        </div>
+    </div>
+
+</body>
+</html>

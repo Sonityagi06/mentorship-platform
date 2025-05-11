@@ -1,0 +1,41 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="com.hrit.mentorship_platform.model.Mentor" %>
+<%
+    Integer userId = (Integer) session.getAttribute("user_id");
+%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Mentor</title>
+    <link rel="stylesheet" href="css/add-mentor.css"> 
+</head>
+<body>
+    <h2>Add Mentor Details</h2>
+
+    <% String errorMessage = (String) request.getAttribute("errorMessage"); %>
+    <% if (errorMessage != null) { %>
+        <p style="color:red;"><%= errorMessage %></p>
+    <% } %>
+
+    <form action="add-mentor" method="POST">
+        <input type="hidden" name="user_id" value="<%= userId %>">
+
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br>
+
+        <label for="expertise">Expertise:</label>
+        <input type="text" id="expertise" name="expertise" required><br>
+
+        <label for="bio">Bio:</label>
+        <textarea id="bio" name="bio" required></textarea><br>
+
+        <label for="contactNo">Contact Number:</label>
+        <input type="text" id="contactNo" name="contactNo" required><br>
+
+        <label for="experienceYears">Years of Experience:</label>
+        <input type="number" id="experienceYears" name="experienceYears" required><br>
+
+        <input type="submit" value="Add Mentor">
+    </form>
+</body>
+</html>

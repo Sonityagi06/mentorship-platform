@@ -1,0 +1,52 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="com.hrit.mentorship_platform.model.Mentee" %>
+<%
+session = request.getSession(false);
+if (session == null || session.getAttribute("user_id") == null) {
+    response.sendRedirect("login.jsp");
+    return;
+}
+Integer userId = (Integer) session.getAttribute("user_id");
+%>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Mentee</title>
+    <link rel="stylesheet" href="css/add-mentee.css"> <!-- Link to the CSS file -->
+</head>
+<body>
+
+    <div class="container">
+        <div class="form-container">
+        <h2>Add Mentee Details</h2>
+         <% String errorMessage = (String) request.getAttribute("errorMessage"); %>
+    <% if (errorMessage != null) { %>
+        <p style="color:red;"><%= errorMessage %></p>
+    <% } %>
+            <form action="add-mentee" method="POST" enctype="multipart/form-data">
+                
+
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="course">Course:</label>
+                <input type="text" id="course" name="course" required>
+
+                <label for="bio">Bio:</label>
+                <textarea id="bio" name="bio" required></textarea>
+
+                <label for="contact_no">Contact Number:</label>
+                <input type="text" id="contact_no" name="contact_no" required>
+
+                <input type="hidden" name="user_id" value="<%= userId %>">
+                
+
+                <input type="submit" value="Add Mentee">
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,51 @@
+package com.hrit.mentorship_platform.servlet;
+
+
+import com.hrit.mentorship_platform.dao.AppointmentDao;
+import com.hrit.mentorship_platform.model.Appointment;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.Date;
+import java.sql.Time;
+
+@WebServlet("/book-appointment")
+public class BookAppointmentServlet extends HttpServlet {
+
+    private static final long serialVersionUID = 1L;
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        // Get the mentee's ID from session (assuming logged in)
+        int menteeId = (int) request.getSession().getAttribute("user_id");
+
+        // Get mentor ID, date, and time from the request
+        int mentorId = Integer.parseInt(request.getParameter("mentor_Id"));
+        Date date = Date.valueOf(request.getParameter("date"));
+        Time time = Time.valueOf(request.getParameter("time") + ":00");
+
+        // Status of the appointment (default is "Pending")
+        String status = "Pending";
+
+        // Create a new Appointment object
+        Appointment appointment = new Appointment(mentorId, menteeId, date, time, status);
+
+        
+        AppointmentDao appointmentDAO = new AppointmentDao();
+
+        // Book the appointment in the database
+        boolean success = appointmentDAO.bookAppointment(appointment);
+
+        if (success) {
+            // Redirect to a success page or mentee appointments page
+            response.sendRedirect("mentee-appointments.jsp?success=true");
+        } else {
+            // Handle failure (redirect to error page or show an error message)
+            response.sendRedirect("mentee-dashboard.jsp?error=true");
+        }
+    }
+}
